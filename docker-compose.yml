@@ -1,0 +1,38 @@
+version: '2'
+services:
+  mysql:
+    container_name: mysql_container
+    restart: always
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root' # TODO: Change this
+    volumes:
+    - ./volumes/mysql/data:/var/lib/mysql
+    - ./volumes/mysql/init:/docker-entrypoint-initdb.d/:ro
+    ports:
+      - "3306:3306"
+    networks:
+      flask_network:
+        ipv4_address: 172.20.0.2    
+
+  flask:
+    container_name: flask_container
+    build: ./app
+    depends_on:
+      - mysql
+    volumes:
+      - ./app:/app
+    ports:
+      - "5000:5000"
+    networks:
+      flask_network:
+        ipv4_address: 172.20.0.3
+
+volumes:
+  my-datavolume:
+  
+networks:
+  flask_network:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
