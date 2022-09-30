@@ -31,11 +31,16 @@ def measurement():
     records = data["records"]
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
-    col_names = ",".join(records[0].keys())
+    col_names = records[0].keys()
+    values_placeholders = ", ".join(["%s"] * len(col_names))
+    col_names_placeholders = ", ".join(col_names)
     for rec in records:
-        sql = f"INSERT INTO measurements ({col_names}) VALUES (%s, %s)"
-        val = (rec["time"], rec["temp_in"])
-        cursor.execute(sql, val)
+        insert_query = """ INSERT INTO measurements (%s) VALUES (%s) """ % (
+            col_names_placeholders,
+            values_placeholders,
+        )
+        val = list(rec.values())
+        cursor.execute(insert_query, val)
         connection.commit()
     cursor.close()
     connection.close()
