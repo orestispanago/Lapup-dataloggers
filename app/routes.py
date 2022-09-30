@@ -25,23 +25,22 @@ def last():
     return jsonify(results)
 
 
+def prepare_insert_statement(records):
+    columns = ", ".join(records[0].keys())
+    val_list = [tuple(r.values()) for r in records]
+    values = ", ".join(map(str, val_list))
+    return f"""INSERT INTO measurements ({columns}) VALUES {values};"""
+
+
 @app.route("/store", methods=["POST"])
 def measurement():
     data = request.json
     records = data["records"]
+    query = prepare_insert_statement(records)
     connection = mysql.connector.connect(**config)
     cursor = connection.cursor()
-    col_names = records[0].keys()
-    values_placeholders = ", ".join(["%s"] * len(col_names))
-    col_names_placeholders = ", ".join(col_names)
-    for rec in records:
-        insert_query = """ INSERT INTO measurements (%s) VALUES (%s) """ % (
-            col_names_placeholders,
-            values_placeholders,
-        )
-        val = list(rec.values())
-        cursor.execute(insert_query, val)
-        connection.commit()
+    cursor.execute(query)
+    connection.commit()
     cursor.close()
     connection.close()
     return "SUCCESS"
