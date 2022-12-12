@@ -1,5 +1,6 @@
-import requests
 import datetime
+
+import requests
 
 
 def get_last_record(table="meteo1min"):
@@ -34,19 +35,37 @@ def populate_db(hundrend_thousand_rows=5, table="meteo1min"):
                 for i in range(1, 100_001)
             ]
         }
-        resp = requests.post(f"http://localhost:5000/store/{table}", json=payload)
+        resp = requests.post(
+            f"http://localhost:5000/store/{table}", json=payload
+        )
 
         print("POST status:", resp.status_code)
         print(resp.text)
 
 
 # populate_db(hundrend_thousand_rows=270)
-date_range = {"start_date": "2015-05-02 00:00:00", "end_date": "2016-05-02 23:59:00"}
-get_resp = requests.post("http://localhost:5000/range/meteo1min", json=date_range)
+# date_range = {
+#     "start_date": "2015-05-02 00:00:00",
+#     "end_date": "2016-05-02 23:59:00",
+# }
+payload = {
+    "records": [
+        {
+            "Datetime_UTC": str(datetime.datetime.utcnow()),
+            "UV_301nm": 611.0,
+            "UV_312nm": 39090.0,
+            "UV_320nm": 35860.0,
+            "UV_340nm": 71280.0,
+            "UV_380nm": 14620.0,
+            "PAR": 59270.0,
+            "temp_int_C": 50.0,
+        }
+    ]
+}
+
+get_resp = requests.post(
+    "http://snf-882758.vm.okeanos.grnet.gr:5000/store/nilu", json=payload
+)
 
 print("POST status:", get_resp.status_code)
-print(len(get_resp.json()))
-
-# get_resp = requests.get("http://localhost:5000/last/meteo1min")
-# print(get_resp.status_code)
-# print(get_resp.text)
+print(get_resp.text)

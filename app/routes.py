@@ -1,18 +1,29 @@
-from flask import request, jsonify
 import MySQLdb
 from __main__ import app
+from flask import jsonify, request
 
 config = {
     "user": "root",
     "password": "root",
     "host": "172.20.0.2",
     "port": 3306,
-    "database": "lapup",
+    "database": "lapupdb",
 }
 
 
+@app.route("/last", methods=["GET"])
+def last_records():
+    connection = MySQLdb.connect(**config)
+    cursor = connection.cursor(MySQLdb.cursors.DictCursor)
+    cursor.execute(f"SELECT * FROM last_records;")
+    results = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(results)
+
+
 @app.route("/last/<tablename>", methods=["GET"])
-def last(tablename):
+def last_record(tablename):
     connection = MySQLdb.connect(**config)
     cursor = connection.cursor(MySQLdb.cursors.DictCursor)
     cursor.execute(f"SELECT * FROM {tablename} ORDER BY id DESC LIMIT 1;")
@@ -20,6 +31,15 @@ def last(tablename):
     cursor.close()
     connection.close()
     return jsonify(results)
+
+
+def prepare_update_statement(records, table=None):
+    last_record_time = records[-1]["Datetime_UTC"]
+    return (
+        f"UPDATE last_records "
+        f"SET last_record_utc = '{last_record_time}'"
+        f"WHERE table_name = '{table}';"
+    )
 
 
 def prepare_insert_statement(records, table=None):
@@ -33,10 +53,12 @@ def prepare_insert_statement(records, table=None):
 def store_records(tablename):
     data = request.json
     records = data["records"]
-    query = prepare_insert_statement(records, table=tablename)
+    insert_statement = prepare_insert_statement(records, table=tablename)
+    update_statement = prepare_update_statement(records, table=tablename)
     connection = MySQLdb.connect(**config)
     cursor = connection.cursor()
-    cursor.execute(query)
+    cursor.execute(insert_statement)
+    cursor.execute(update_statement)
     connection.commit()
     cursor.close()
     connection.close()
