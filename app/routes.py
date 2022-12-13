@@ -11,7 +11,7 @@ config = {
 }
 
 
-@app.route("/last", methods=["GET"])
+@app.route("/dataloggers/last", methods=["GET"])
 def last_records():
     connection = MySQLdb.connect(**config)
     cursor = connection.cursor(MySQLdb.cursors.DictCursor)
@@ -22,7 +22,7 @@ def last_records():
     return jsonify(results)
 
 
-@app.route("/last/<tablename>", methods=["GET"])
+@app.route("/dataloggers/last/<tablename>", methods=["GET"])
 def last_record(tablename):
     connection = MySQLdb.connect(**config)
     cursor = connection.cursor(MySQLdb.cursors.DictCursor)
@@ -49,7 +49,7 @@ def prepare_insert_statement(records, table=None):
     return f"""INSERT INTO {table} ({columns}) VALUES {values};"""
 
 
-@app.route("/store/<tablename>", methods=["POST"])
+@app.route("/dataloggers/store/<tablename>", methods=["POST"])
 def store_records(tablename):
     data = request.json
     records = data["records"]
@@ -65,7 +65,7 @@ def store_records(tablename):
     return "OK"
 
 
-@app.route("/range/<tablename>", methods=["POST"])
+@app.route("/dataloggers/range/<tablename>", methods=["POST"])
 def get_time_range(tablename):
     data = request.json
     start_date = data["start_date"]

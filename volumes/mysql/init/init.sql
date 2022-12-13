@@ -73,7 +73,7 @@ CREATE TABLE `lapupdb`.`nilu` (
 --     '59270.0',
 --     '50.0'
 --   );
-CREATE TABLE `lapupdb`.`new_table` (
+CREATE TABLE `lapupdb`.`last_records` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `table_name` VARCHAR(45) NULL,
   `last_record_utc` DATETIME NULL,

@@ -64,7 +64,8 @@ payload = {
 }
 
 get_resp = requests.post(
-    "http://snf-882758.vm.okeanos.grnet.gr:5000/store/nilu", json=payload
+    "https://snf-882758.vm.okeanos.grnet.gr/dataloggers/store/nilu",
+    json=payload,
 )
 
 print("POST status:", get_resp.status_code)

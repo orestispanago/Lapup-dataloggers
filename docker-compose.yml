@@ -28,11 +28,9 @@ services:
       flask_network:
         ipv4_address: 172.20.0.3
 
-volumes:
-  my-datavolume:
-  
 networks:
   flask_network:
+    name: flask_network
     ipam:
       config:
         - subnet: 172.20.0.0/24
